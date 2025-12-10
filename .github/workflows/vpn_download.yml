@@ -6,6 +6,7 @@ on:
 
 jobs:
   download-and-upload:
+    # Use a runner that supports installing custom software
     runs-on: ubuntu-latest
     
     # Define environment variables linked to GitHub Secrets
@@ -22,17 +23,28 @@ jobs:
       # ⚙️ Install necessary system packages (Firefox, Python, zip)
       - name: ⚙️ Install Browser, Python, and Tools
         run: |
-          sudo apt-get update
+          # 1. Update system and install Firefox, Python tools, and zip
+          sudo apt-get update -y
           sudo apt-get install -y firefox python3 python3-pip zip 
           
-          # Install Python dependencies
+          # 2. Install Python dependencies
           pip3 install selenium
           
-          # Install GeckoDriver
+          # 3. Download and Install GeckoDriver
+          # Download a specific version for compatibility
           GECKODRIVER_VERSION="v0.34.0" 
           wget -q https://github.com/mozilla/geckodriver/releases/download/$GECKODRIVER_VERSION/geckodriver-$GECKODRIVER_VERSION-linux64.tar.gz
           tar -xzf geckodriver-$GECKODRIVER_VERSION-linux64.tar.gz
+          
+          # Move GeckoDriver to a standard binary location in PATH and set execution permissions
           sudo mv geckodriver /usr/local/bin/
+          sudo chmod +x /usr/local/bin/geckodriver
+          
+          # Verify the installation path of Firefox (optional check)
+          if [ ! -f /usr/bin/firefox ]; then
+            echo "::error::Firefox executable not found at /usr/bin/firefox"
+            exit 1
+          fi
 
       # 🚀 Execute the Python script. Files are saved in downloaded_configs/.
       - name: 🏃 Execute ProtonVPN Downloader
@@ -46,6 +58,7 @@ jobs:
           TIMESTAMP=$(date +%Y%m%d_%H%M%S)
           ZIP_FILENAME="configs_${TIMESTAMP}.zip"
           
+          # Check if the directory exists and is not empty before zipping
           if [ -d "downloaded_configs" ] && [ "$(ls -A downloaded_configs)" ]; then
             zip -r "$ZIP_FILENAME" downloaded_configs/
             echo "ZIP_FILE=$ZIP_FILENAME" >> $GITHUB_ENV
@@ -68,6 +81,6 @@ jobs:
             Actor: ${{ github.actor }}
           
       - name: ✅ Clean up
-        # Remove temporary files and directories
+        # Remove temporary files and directories, always run this step
         if: always()
         run: rm -rf downloaded_configs *.zip
