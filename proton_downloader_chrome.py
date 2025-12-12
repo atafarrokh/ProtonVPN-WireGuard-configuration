@@ -222,7 +222,7 @@ class ProtonVPN:
                             # print(f"Could not determine Server ID/Button for row {index} in {country_name}. Error: {e}")
                             continue 
 
-                        random_delay = random.randint(5, 10) 
+                        random_delay = random.randint(30, 40) 
                         
                         # --- Execute Download ---
                         try:
