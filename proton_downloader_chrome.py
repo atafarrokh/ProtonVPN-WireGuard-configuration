@@ -22,7 +22,7 @@ SERVER_ID_LOG_FILE = os.path.join(os.getcwd(), "downloaded_server_ids.json")
 TARGET_COUNTRY_NAME = None # Process all countries
 MAX_DOWNLOADS_PER_SESSION = 20 
 MAX_OPENVPN_DOWNLOADS_PER_SESSION = 20
-RELOGIN_DELAY = 60
+RELOGIN_DELAY = 20
 
 # Environment variables will be read once at runtime
 TELEGRAM_BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN")
@@ -222,7 +222,7 @@ class ProtonVPN:
                             # print(f"Could not determine Server ID/Button for row {index} in {country_name}. Error: {e}")
                             continue 
 
-                        random_delay = random.randint(10, 20) 
+                        random_delay = random.randint(5, 10) 
                         
                         # --- Execute Download ---
                         try:
